@@ -1,2 +1,2 @@
-dex:dexJeremy:123
-jeremy:123
+dex:dex:badge3,badge1,badge2
+jeremy:jer:

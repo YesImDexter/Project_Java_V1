@@ -19,6 +19,7 @@ public class GUIController {
     private JPanel registerPanel;
     private JPanel homeMenuPanel;
     private JPanel leaderboardPanel;
+    private JPanel achievementsPanel;
     private JLabel loginErrorLabel;
     private JLabel registerErrorLabel;
     private JLabel homeWelcomeLabel;
@@ -44,12 +45,15 @@ public class GUIController {
         quizPanel.setBackground(Color.WHITE);
         // Leaderboard panel
         leaderboardPanel = createLeaderboardPanel();
+        // Achievements panel
+        achievementsPanel = createAchievementsPanel();
 
         mainPanel.add(loginPanel, "login");
         mainPanel.add(registerPanel, "register");
         mainPanel.add(homeMenuPanel, "home");
         mainPanel.add(quizPanel, "quiz");
         mainPanel.add(leaderboardPanel, "leaderboard");
+        mainPanel.add(achievementsPanel, "achievements");
 
         frame.setContentPane(mainPanel);
         cardLayout.show(mainPanel, "login");
@@ -118,6 +122,8 @@ public class GUIController {
                 passField.setText("");
                 loginErrorLabel.setText("");
                 updateHomeMenuWelcome();
+                JOptionPane.showMessageDialog(frame, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                showWelcomePopup();
                 cardLayout.show(mainPanel, "home");
             } else {
                 loginErrorLabel.setText("Invalid username or password.");
@@ -208,6 +214,8 @@ public class GUIController {
                 passField.setText("");
                 registerErrorLabel.setText("");
                 updateHomeMenuWelcome();
+                JOptionPane.showMessageDialog(frame, "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                showWelcomePopup();
                 cardLayout.show(mainPanel, "home");
             } else {
                 registerErrorLabel.setText("Registration failed. Try again.");
@@ -218,6 +226,78 @@ public class GUIController {
             cardLayout.show(mainPanel, "login");
         });
         return panel;
+    }
+
+    // Show welcome popup after login/register
+    private void showWelcomePopup() {
+        String name = currentUser != null ? currentUser : "Guest";
+        JOptionPane.showMessageDialog(frame, "Welcome, " + name + "!", "Welcome", JOptionPane.PLAIN_MESSAGE);
+    }
+
+    // --- BADGE SYSTEM --- //
+    // User database format: username:password:badge1,badge2,...
+    private Map<String, String[]> loadUserDatabaseWithBadges() {
+        Map<String, String[]> users = new HashMap<>();
+        File dbFile = new File("user_database.txt");
+        if (!dbFile.exists()) return users;
+        try (BufferedReader br = new BufferedReader(new FileReader(dbFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || !line.contains(":")) continue;
+                String[] parts = line.split(":");
+                if (parts.length >= 2) {
+                    String badges = parts.length >= 3 ? parts[2] : "";
+                    users.put(parts[0].trim(), new String[]{parts[1].trim(), badges.trim()});
+                }
+            }
+        } catch (IOException e) {
+            // ignore, return what we have
+        }
+        return users;
+    }
+
+    private Set<String> getUserBadges(String username) {
+        Map<String, String[]> users = loadUserDatabaseWithBadges();
+        if (!users.containsKey(username)) return new HashSet<>();
+        String badgeStr = users.get(username)[1];
+        Set<String> badges = new HashSet<>();
+        if (badgeStr != null && !badgeStr.isEmpty()) {
+            for (String b : badgeStr.split(",")) {
+                if (!b.trim().isEmpty()) badges.add(b.trim());
+            }
+        }
+        return badges;
+    }
+
+    private void addUserBadge(String username, String badge) {
+        File dbFile = new File("user_database.txt");
+        File tempFile = new File("user_database_temp.txt");
+        try (BufferedReader br = new BufferedReader(new FileReader(dbFile));
+             BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(":");
+                if (parts.length >= 2 && parts[0].trim().equals(username)) {
+                    Set<String> badges = new HashSet<>();
+                    if (parts.length >= 3 && !parts[2].trim().isEmpty()) {
+                        badges.addAll(Arrays.asList(parts[2].split(",")));
+                    }
+                    if (!badges.contains(badge)) {
+                        badges.add(badge);
+                    }
+                    String badgeStr = String.join(",", badges);
+                    bw.write(parts[0] + ":" + parts[1] + ":" + badgeStr);
+                } else {
+                    bw.write(line);
+                }
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            return;
+        }
+        dbFile.delete();
+        tempFile.renameTo(dbFile);
     }
 
     private Map<String, String> loadUserDatabase() {
@@ -241,30 +321,27 @@ public class GUIController {
     }
 
     private boolean authenticateUser(String username, String password) {
-        Map<String, String> users = loadUserDatabase();
-        System.out.println("Loaded users: " + users);
+        Map<String, String[]> users = loadUserDatabaseWithBadges();
         String user = username.trim();
         String pass = password.trim();
         if (!users.containsKey(user)) {
-            System.out.println("Username not found: " + user);
             return false;
         }
-        if (!users.get(user).equals(pass)) {
-            System.out.println("Password mismatch for user: " + user + ". Expected: [" + users.get(user) + "] Got: [" + pass + "]");
+        if (!users.get(user)[0].equals(pass)) {
             return false;
         }
         return true;
     }
 
     private boolean userExists(String username) {
-        Map<String, String> users = loadUserDatabase();
+        Map<String, String[]> users = loadUserDatabaseWithBadges();
         return users.containsKey(username);
     }
 
     private boolean registerUser(String username, String password) {
         File dbFile = new File("user_database.txt");
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(dbFile, true))) {
-            bw.write(username + ":" + password);
+            bw.write(username + ":" + password + ":"); // No badges at registration
             bw.newLine();
             return true;
         } catch (IOException e) {
@@ -316,7 +393,7 @@ public class GUIController {
         centerPanel.add(Box.createVerticalStrut(30));
 
         // --- Load custom icons for buttons ---
-        ImageIcon quizIcon = null, learningIcon = null, leaderboardIcon = null;
+        ImageIcon quizIcon = null, learningIcon = null, leaderboardIcon = null, achievementsIcon = null;
         try {
             quizIcon = new ImageIcon(new ImageIcon("Icons/result-a-plus-icon.png").getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH));
         } catch (Exception e) { quizIcon = null; }
@@ -326,6 +403,9 @@ public class GUIController {
         try {
             leaderboardIcon = new ImageIcon(new ImageIcon("Icons/leaderboard-icon.png").getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH));
         } catch (Exception e) { leaderboardIcon = null; }
+        try {
+            achievementsIcon = new ImageIcon(new ImageIcon("Icons/quality-badge-star-icon.png").getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH));
+        } catch (Exception e) { achievementsIcon = null; }
 
         // --- Set button width and padding ---
         int btnWidth = 240;
@@ -371,6 +451,19 @@ public class GUIController {
         leaderboardBtn.setPreferredSize(new Dimension(btnWidth, btnHeight));
         leaderboardBtn.setMargin(btnPadding);
 
+        JButton achievementsBtn = new JButton("Achievements");
+        if (achievementsIcon != null) achievementsBtn.setIcon(achievementsIcon);
+        achievementsBtn.setHorizontalAlignment(SwingConstants.LEFT);
+        achievementsBtn.setIconTextGap(12);
+        achievementsBtn.setFont(new Font("Arial", Font.BOLD, 16));
+        achievementsBtn.setBackground(new Color(220, 230, 255));
+        achievementsBtn.setFocusPainted(false);
+        achievementsBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        achievementsBtn.setMaximumSize(new Dimension(btnWidth, btnHeight));
+        achievementsBtn.setMinimumSize(new Dimension(btnWidth, btnHeight));
+        achievementsBtn.setPreferredSize(new Dimension(btnWidth, btnHeight));
+        achievementsBtn.setMargin(btnPadding);
+
         JButton logoutBtn = new JButton("Logout");
         logoutBtn.setFont(new Font("Arial", Font.BOLD, 13));
         logoutBtn.setBackground(new Color(255, 220, 220));
@@ -397,6 +490,11 @@ public class GUIController {
             currentUser = null;
             cardLayout.show(mainPanel, "login");
         });
+        achievementsBtn.addActionListener(e -> {
+            achievementsPanel = createAchievementsPanel(); // Refresh for current user
+            mainPanel.add(achievementsPanel, "achievements");
+            cardLayout.show(mainPanel, "achievements");
+        });
 
         centerPanel.add(quizBtn);
         centerPanel.add(Box.createVerticalStrut(15));
@@ -404,10 +502,12 @@ public class GUIController {
         centerPanel.add(Box.createVerticalStrut(15));
         centerPanel.add(leaderboardBtn);
         centerPanel.add(Box.createVerticalStrut(15));
+        centerPanel.add(achievementsBtn);
+        centerPanel.add(Box.createVerticalStrut(15));
         centerPanel.add(logoutBtn);
 
         centerPanel.add(Box.createVerticalStrut(30));
-        JLabel credits = new JLabel("© 2024 GreenEarth Initiative");
+        JLabel credits = new JLabel("© 2025 JavaLover G02/SE-G01 2025");
         credits.setFont(new Font("Arial", Font.PLAIN, 11));
         credits.setForeground(new Color(100, 120, 100));
         credits.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -415,6 +515,69 @@ public class GUIController {
 
         homeMenu.add(centerPanel, BorderLayout.CENTER);
         return homeMenu;
+    }
+
+    private JPanel createAchievementsPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(new Color(240, 245, 255));
+        JLabel title = new JLabel("Achievements");
+        title.setFont(new Font("Arial", Font.BOLD, 22));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+        panel.add(title, BorderLayout.NORTH);
+
+        JPanel badgePanel = new JPanel();
+        badgePanel.setLayout(new BoxLayout(badgePanel, BoxLayout.Y_AXIS));
+        badgePanel.setOpaque(false);
+
+        // Badge definitions: {badgeKey, name, description, iconPath}
+        String[][] badges = {
+            {"badge1", "First Quiz!", "Complete any quiz.", "Badges/badge1.png"},
+            {"badge2", "3 Correct!", "Get at least 3 answers correct in a quiz.", "Badges/badge2.png"},
+            {"badge3", "Perfect Score!", "Get all answers correct in a quiz.", "Badges/badge3.png"}
+        };
+        Set<String> userBadges = currentUser != null ? getUserBadges(currentUser) : new HashSet<>();
+        for (String[] badge : badges) {
+            JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            row.setOpaque(false);
+            JLabel iconLabel;
+            try {
+                ImageIcon icon = new ImageIcon(new ImageIcon(badge[3]).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH));
+                if (!userBadges.contains(badge[0])) {
+                    // Grey out icon if not earned
+                    Image img = GrayFilter.createDisabledImage(icon.getImage());
+                    icon = new ImageIcon(img);
+                }
+                iconLabel = new JLabel(icon);
+            } catch (Exception e) {
+                iconLabel = new JLabel(userBadges.contains(badge[0]) ? "★" : "☆");
+                iconLabel.setFont(new Font("Arial", Font.BOLD, 28));
+            }
+            row.add(iconLabel);
+            JLabel name = new JLabel(badge[1]);
+            name.setFont(new Font("Arial", Font.BOLD, 16));
+            name.setForeground(userBadges.contains(badge[0]) ? new Color(34, 139, 34) : Color.GRAY);
+            row.add(name);
+            JLabel desc = new JLabel(" - " + badge[2]);
+            desc.setFont(new Font("Arial", Font.PLAIN, 13));
+            desc.setForeground(Color.DARK_GRAY);
+            row.add(desc);
+            badgePanel.add(row);
+        }
+        panel.add(badgePanel, BorderLayout.CENTER);
+
+        JButton backBtn = new JButton("⟵ Back to Home");
+        backBtn.setFont(new Font("Arial", Font.BOLD, 15));
+        backBtn.setBackground(new Color(220, 245, 230));
+        backBtn.setFocusPainted(false);
+        backBtn.addActionListener(e -> cardLayout.show(mainPanel, "home"));
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setBackground(new Color(240, 245, 255));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(18, 10, 18, 10));
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+        bottomPanel.add(backBtn);
+        panel.add(bottomPanel, BorderLayout.SOUTH);
+        return panel;
     }
 
     private void showQuizPanel() {
@@ -658,6 +821,37 @@ public class GUIController {
 
     private void showQuizResult() {
         quizPanel.removeAll();
+        // --- BADGE CHECK LOGIC ---
+        if (currentUser != null) {
+            Set<String> earned = getUserBadges(currentUser);
+            List<String> newBadges = new ArrayList<>();
+            int correctCount = 0;
+            int totalQuestions = quiz.getTotalQuestions();
+            int totalScore = 0;
+            int userScore = quiz.getScore();
+            for (int i = 0; i < totalQuestions; i++) {
+                totalScore += quiz.getQuestionAt(i).getPoints();
+                if (quiz.getPointsEarned(i) == quiz.getQuestionAt(i).getPoints()) correctCount++;
+            }
+            // Badge 1: Participation
+            if (!earned.contains("badge1")) {
+                addUserBadge(currentUser, "badge1");
+                newBadges.add("First Quiz! (Complete any quiz)");
+            }
+            // Badge 2: 3 correct
+            if (correctCount >= 3 && !earned.contains("badge2")) {
+                addUserBadge(currentUser, "badge2");
+                newBadges.add("3 Correct! (Get at least 3 answers correct in a quiz)");
+            }
+            // Badge 3: Perfect score
+            if (userScore == totalScore && totalQuestions > 0 && !earned.contains("badge3")) {
+                addUserBadge(currentUser, "badge3");
+                newBadges.add("Perfect Score! (Get all answers correct in a quiz)");
+            }
+            if (!newBadges.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Congratulations! You earned new badge(s):\n" + String.join("\n", newBadges), "New Achievement!", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
 
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
