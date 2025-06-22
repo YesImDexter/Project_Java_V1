@@ -234,6 +234,7 @@ public class GUIController {
         JOptionPane.showMessageDialog(frame, "Welcome, " + name + "!", "Welcome", JOptionPane.PLAIN_MESSAGE);
     }
 
+<<<<<<< Updated upstream
     // --- BADGE SYSTEM --- //
     // User database format: username:password:badge1,badge2,...
     private Map<String, String[]> loadUserDatabaseWithBadges() {
