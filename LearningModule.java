@@ -26,11 +26,25 @@ public class LearningModule {
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(2, 1, 20, 20));
+        buttonPanel.setLayout(new GridLayout(3, 1, 20, 20));
         buttonPanel.setBackground(new Color(230, 255, 240));
 
         JButton learningBtn = new JButton("Open Learning Module");
         JButton videoBtn = new JButton("Watch Awareness Videos");
+        JButton backToMainBtn = new JButton("Back to Menu");
+        backToMainBtn.setFont(new Font("Arial", Font.PLAIN, 13));
+        backToMainBtn.setBackground(new Color(255, 220, 220));
+        backToMainBtn.setPreferredSize(new Dimension(120, 32));
+        backToMainBtn.addActionListener(e -> {
+            frame.setVisible(false);
+            // Try to bring main menu back to front if it exists
+            for (Frame f : Frame.getFrames()) {
+                if (f.getTitle().contains("Environmental Awareness Quiz")) {
+                    f.setVisible(true);
+                    f.toFront();
+                }
+            }
+        });
 
         learningBtn.setFont(new Font("Arial", Font.PLAIN, 16));
         videoBtn.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -40,6 +54,7 @@ public class LearningModule {
 
         buttonPanel.add(learningBtn);
         buttonPanel.add(videoBtn);
+        buttonPanel.add(backToMainBtn);
 
         homeMenu.add(welcomeLabel, BorderLayout.NORTH);
         homeMenu.add(buttonPanel, BorderLayout.CENTER);

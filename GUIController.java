@@ -295,7 +295,7 @@ public class GUIController {
             Image scaled = logo.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
             logoLabel = new JLabel(new ImageIcon(scaled));
         } catch (Exception e) {
-            logoLabel = new JLabel("🌱");
+            logoLabel = new JLabel("\uD83C\uDF31");
             logoLabel.setFont(new Font("Arial", Font.PLAIN, 60));
         }
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -316,9 +316,33 @@ public class GUIController {
 
         centerPanel.add(Box.createVerticalStrut(30));
 
-        JButton quizBtn = new JButton("📝  Start Quiz");
-        JButton learningBtn = new JButton("📖  Open Learning Module");
-        JButton leaderboardBtn = new JButton("🏆  View Leaderboard");
+        // --- Load custom icons for buttons ---
+        ImageIcon quizIcon = null, learningIcon = null, leaderboardIcon = null;
+        try {
+            quizIcon = new ImageIcon(new ImageIcon("Icons/result-a-plus-icon.png").getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH));
+        } catch (Exception e) { quizIcon = null; }
+        try {
+            learningIcon = new ImageIcon(new ImageIcon("Icons/book-icon.png").getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH));
+        } catch (Exception e) { learningIcon = null; }
+        try {
+            leaderboardIcon = new ImageIcon(new ImageIcon("Icons/leaderboard-icon.png").getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH));
+        } catch (Exception e) { leaderboardIcon = null; }
+
+        JButton quizBtn = new JButton("Start Quiz");
+        if (quizIcon != null) quizBtn.setIcon(quizIcon);
+        quizBtn.setHorizontalAlignment(SwingConstants.LEFT);
+        quizBtn.setIconTextGap(12);
+
+        JButton learningBtn = new JButton("Open Learning Module");
+        if (learningIcon != null) learningBtn.setIcon(learningIcon);
+        learningBtn.setHorizontalAlignment(SwingConstants.LEFT);
+        learningBtn.setIconTextGap(12);
+
+        JButton leaderboardBtn = new JButton("View Leaderboard");
+        if (leaderboardIcon != null) leaderboardBtn.setIcon(leaderboardIcon);
+        leaderboardBtn.setHorizontalAlignment(SwingConstants.LEFT);
+        leaderboardBtn.setIconTextGap(12);
+
         JButton logoutBtn = new JButton("Logout");
 
         quizBtn.setFont(new Font("Arial", Font.BOLD, 16));
@@ -364,7 +388,7 @@ public class GUIController {
         centerPanel.add(logoutBtn);
 
         centerPanel.add(Box.createVerticalStrut(30));
-        JLabel credits = new JLabel("© 2024 GreenEarth Initiative");
+        JLabel credits = new JLabel("© 2025 JAVALover G02/SE-G01");
         credits.setFont(new Font("Arial", Font.PLAIN, 11));
         credits.setForeground(new Color(100, 120, 100));
         credits.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -790,7 +814,18 @@ public class GUIController {
         JPanel leaderboardPanel = new JPanel(new BorderLayout());
         leaderboardPanel.setBackground(new Color(255, 255, 245));
 
-        JLabel title = new JLabel("🏆 Leaderboard");
+        JLabel title;
+        ImageIcon leaderboardIcon = null;
+        try {
+            leaderboardIcon = new ImageIcon(new ImageIcon("Icons/leaderboard-icon.png").getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH));
+        } catch (Exception e) { leaderboardIcon = null; }
+        if (leaderboardIcon != null) {
+            title = new JLabel("Leaderboard", leaderboardIcon, JLabel.CENTER);
+            title.setHorizontalTextPosition(JLabel.RIGHT);
+            title.setIconTextGap(10);
+        } else {
+            title = new JLabel("\uD83C\uDFC6 Leaderboard");
+        }
         title.setFont(new Font("Arial", Font.BOLD, 22));
         title.setHorizontalAlignment(SwingConstants.CENTER);
         title.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
