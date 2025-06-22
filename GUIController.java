@@ -23,12 +23,8 @@ public class GUIController {
         pointCounter = new JLabel("Points: 0");
         pointCounter.setFont(new Font("Arial", Font.BOLD, 15));
         pointCounter.setHorizontalAlignment(SwingConstants.RIGHT);
-        JPanel topBar = new JPanel(new BorderLayout());
-        topBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-        topBar.setOpaque(false);
-        topBar.add(pointCounter, BorderLayout.EAST);
-        panel.add(topBar);
-        loadQuestion();
+        pointCounter.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 20));
+        showMainMenu();
     }
 
     private void updatePointCounter() {
@@ -37,7 +33,7 @@ public class GUIController {
 
     private void loadQuestion() {
         panel.removeAll();
-        // Add top bar with point counter
+        // Add top bar with point counter (only in quiz module)
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
         topBar.setOpaque(false);
@@ -178,7 +174,7 @@ public class GUIController {
             // Layout: resultPanel (summary) + table (full width) + leaderboard + restart button
             panel.removeAll();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            panel.add(topBar);
+            panel.add(topBar); // <-- keep point counter at top right on results too
             panel.add(Box.createVerticalGlue());
             panel.add(resultPanel);
             panel.add(Box.createVerticalStrut(10));
@@ -188,6 +184,14 @@ public class GUIController {
             panel.add(Box.createVerticalStrut(10));
             panel.add(restartBtn);
             panel.add(Box.createVerticalGlue());
+
+            // Add Main Menu button
+            JButton mainMenuBtn = new JButton("Main Menu");
+            mainMenuBtn.setFont(new Font("Arial", Font.BOLD, 15));
+            mainMenuBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            mainMenuBtn.addActionListener(e -> showMainMenu());
+            panel.add(mainMenuBtn);
+
             frame.setContentPane(panel);
             frame.setVisible(true);
             frame.revalidate();
@@ -363,6 +367,7 @@ public class GUIController {
 
         panel.removeAll();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(topBar); // <-- keep point counter at top right during quiz
         panel.add(Box.createVerticalGlue());
         panel.add(qPanel);
         panel.add(Box.createVerticalGlue());
@@ -385,6 +390,51 @@ public class GUIController {
             }
         }
         return sb.length() > 0 ? sb.toString().trim() : answer;
+    }
+
+    public void showMainMenu() {
+        panel.removeAll();
+        // No point counter in main menu
+        JPanel menuPanel = new JPanel();
+        menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
+        menuPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
+        menuPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel title = new JLabel("Main Menu");
+        title.setFont(new Font("Arial", Font.BOLD, 26));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        menuPanel.add(title);
+        menuPanel.add(Box.createVerticalStrut(30));
+
+        JButton quizBtn = new JButton("Quiz Module");
+        quizBtn.setFont(new Font("Arial", Font.BOLD, 18));
+        quizBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        quizBtn.addActionListener(e -> {
+            quiz = new QuizModule();
+            updatePointCounter();
+            loadQuestion();
+        });
+        menuPanel.add(quizBtn);
+        menuPanel.add(Box.createVerticalStrut(20));
+
+        JButton learnBtn = new JButton("Learning Module");
+        learnBtn.setFont(new Font("Arial", Font.BOLD, 18));
+        learnBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        learnBtn.addActionListener(e -> {
+            // Show the actual learning module window from LearningModule.java
+            LearningModule.main(new String[]{});
+            // Optionally, hide this main menu window while learning module is open
+            frame.setVisible(false);
+        });
+        menuPanel.add(learnBtn);
+
+        panel.add(Box.createVerticalGlue());
+        panel.add(menuPanel);
+        panel.add(Box.createVerticalGlue());
+        frame.setContentPane(panel);
+        frame.setVisible(true);
+        frame.revalidate();
+        frame.repaint();
     }
 
     public static void main(String[] args) {

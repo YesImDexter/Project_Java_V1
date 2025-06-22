@@ -1,0 +1,52 @@
+import java.awt.*;
+import javax.swing.*;
+
+public class ContentPage extends JPanel {
+    public ContentPage(int pageNumber, int totalPages, String titleText, String contentText, String imagePath) {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBackground(Color.WHITE);
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel title = new JLabel(titleText);
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        add(title);
+        add(Box.createVerticalStrut(10));
+
+        if (imagePath != null && !imagePath.isEmpty()) {
+            try {
+                ImageIcon icon = new ImageIcon(imagePath);
+                Image scaledImage = icon.getImage().getScaledInstance(280, 160, Image.SCALE_SMOOTH);
+                JLabel img = new JLabel(new ImageIcon(scaledImage));
+                img.setAlignmentX(Component.CENTER_ALIGNMENT);
+                add(img);
+                add(Box.createVerticalStrut(10));
+            } catch (Exception e) {
+                System.out.println("Image not found: " + imagePath);
+            }
+        }
+
+        JTextArea content = new JTextArea(contentText);
+        content.setWrapStyleWord(true);
+        content.setLineWrap(true);
+        content.setFont(new Font("Serif", Font.PLAIN, 14));
+        content.setEditable(false);
+        content.setBackground(new Color(248, 248, 248));
+        content.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        content.setMaximumSize(new Dimension(320, 300));
+
+        JScrollPane scrollPane = new JScrollPane(content);
+        scrollPane.setPreferredSize(new Dimension(320, 300));
+        scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        add(scrollPane);
+
+        add(Box.createVerticalStrut(10));
+
+        JLabel pageNumberLabel = new JLabel("Page " + pageNumber + " of " + totalPages);
+        pageNumberLabel.setFont(new Font("Arial", Font.ITALIC, 12));
+        pageNumberLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        add(pageNumberLabel);
+    }
+}
+
+
