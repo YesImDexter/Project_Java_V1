@@ -2,7 +2,6 @@ import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
@@ -295,7 +294,7 @@ public class GUIController {
             Image scaled = logo.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
             logoLabel = new JLabel(new ImageIcon(scaled));
         } catch (Exception e) {
-            logoLabel = new JLabel("\uD83C\uDF31");
+            logoLabel = new JLabel("🌱");
             logoLabel.setFont(new Font("Arial", Font.PLAIN, 60));
         }
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -328,55 +327,59 @@ public class GUIController {
             leaderboardIcon = new ImageIcon(new ImageIcon("Icons/leaderboard-icon.png").getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH));
         } catch (Exception e) { leaderboardIcon = null; }
 
+        // --- Set button width and padding ---
+        int btnWidth = 240;
+        int btnHeight = 44;
+        Insets btnPadding = new Insets(8, 18, 8, 18);
+
         JButton quizBtn = new JButton("Start Quiz");
         if (quizIcon != null) quizBtn.setIcon(quizIcon);
         quizBtn.setHorizontalAlignment(SwingConstants.LEFT);
         quizBtn.setIconTextGap(12);
+        quizBtn.setFont(new Font("Arial", Font.BOLD, 16));
+        quizBtn.setBackground(new Color(200, 240, 215));
+        quizBtn.setFocusPainted(false);
+        quizBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        quizBtn.setMaximumSize(new Dimension(btnWidth, btnHeight));
+        quizBtn.setMinimumSize(new Dimension(btnWidth, btnHeight));
+        quizBtn.setPreferredSize(new Dimension(btnWidth, btnHeight));
+        quizBtn.setMargin(btnPadding);
 
-        JButton learningBtn = new JButton("Open Learning Module");
+        JButton learningBtn = new JButton("Learning Module");
         if (learningIcon != null) learningBtn.setIcon(learningIcon);
         learningBtn.setHorizontalAlignment(SwingConstants.LEFT);
         learningBtn.setIconTextGap(12);
+        learningBtn.setFont(new Font("Arial", Font.BOLD, 16));
+        learningBtn.setBackground(new Color(200, 240, 215));
+        learningBtn.setFocusPainted(false);
+        learningBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        learningBtn.setMaximumSize(new Dimension(btnWidth, btnHeight));
+        learningBtn.setMinimumSize(new Dimension(btnWidth, btnHeight));
+        learningBtn.setPreferredSize(new Dimension(btnWidth, btnHeight));
+        learningBtn.setMargin(btnPadding);
 
         JButton leaderboardBtn = new JButton("View Leaderboard");
         if (leaderboardIcon != null) leaderboardBtn.setIcon(leaderboardIcon);
         leaderboardBtn.setHorizontalAlignment(SwingConstants.LEFT);
         leaderboardBtn.setIconTextGap(12);
+        leaderboardBtn.setFont(new Font("Arial", Font.BOLD, 16));
+        leaderboardBtn.setBackground(new Color(255, 240, 200));
+        leaderboardBtn.setFocusPainted(false);
+        leaderboardBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        leaderboardBtn.setMaximumSize(new Dimension(btnWidth, btnHeight));
+        leaderboardBtn.setMinimumSize(new Dimension(btnWidth, btnHeight));
+        leaderboardBtn.setPreferredSize(new Dimension(btnWidth, btnHeight));
+        leaderboardBtn.setMargin(btnPadding);
 
         JButton logoutBtn = new JButton("Logout");
-
-        // --- Standardize button sizes ---
-        Dimension menuBtnSize = new Dimension(240, 38);
-        Dimension logoutBtnSize = new Dimension(240, 32);
-        quizBtn.setPreferredSize(menuBtnSize);
-        quizBtn.setMaximumSize(menuBtnSize);
-        quizBtn.setMinimumSize(menuBtnSize);
-        learningBtn.setPreferredSize(menuBtnSize);
-        learningBtn.setMaximumSize(menuBtnSize);
-        learningBtn.setMinimumSize(menuBtnSize);
-        leaderboardBtn.setPreferredSize(menuBtnSize);
-        leaderboardBtn.setMaximumSize(menuBtnSize);
-        leaderboardBtn.setMinimumSize(menuBtnSize);
-        logoutBtn.setPreferredSize(logoutBtnSize);
-        logoutBtn.setMaximumSize(logoutBtnSize);
-        logoutBtn.setMinimumSize(logoutBtnSize);
-
-        quizBtn.setFont(new Font("Arial", Font.BOLD, 16));
-        learningBtn.setFont(new Font("Arial", Font.BOLD, 16));
-        leaderboardBtn.setFont(new Font("Arial", Font.BOLD, 16));
         logoutBtn.setFont(new Font("Arial", Font.BOLD, 13));
-        quizBtn.setBackground(new Color(200, 240, 215));
-        learningBtn.setBackground(new Color(200, 240, 215));
-        leaderboardBtn.setBackground(new Color(255, 240, 200));
         logoutBtn.setBackground(new Color(255, 220, 220));
-        quizBtn.setFocusPainted(false);
-        learningBtn.setFocusPainted(false);
-        leaderboardBtn.setFocusPainted(false);
         logoutBtn.setFocusPainted(false);
-        quizBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        learningBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        leaderboardBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         logoutBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        logoutBtn.setMaximumSize(new Dimension(btnWidth, btnHeight));
+        logoutBtn.setMinimumSize(new Dimension(btnWidth, btnHeight));
+        logoutBtn.setPreferredSize(new Dimension(btnWidth, btnHeight));
+        logoutBtn.setMargin(btnPadding);
 
         quizBtn.addActionListener(e -> {
             quiz = new QuizModule();
@@ -404,7 +407,7 @@ public class GUIController {
         centerPanel.add(logoutBtn);
 
         centerPanel.add(Box.createVerticalStrut(30));
-        JLabel credits = new JLabel("© 2025 JAVALover G02/SE-G01");
+        JLabel credits = new JLabel("© 2024 GreenEarth Initiative");
         credits.setFont(new Font("Arial", Font.PLAIN, 11));
         credits.setForeground(new Color(100, 120, 100));
         credits.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -771,7 +774,7 @@ public class GUIController {
             DataStorage db = new DataStorage();
             db.saveScore(name, userScore);
             Map<String, List<Integer>> allScores = db.getAllScores();
-            // Build a list of name/score pairs for all scores
+            // Build a list of name/score pairs for all scores (not just max per user)
             List<Map.Entry<String, Integer>> topList = new ArrayList<>();
             for (Map.Entry<String, List<Integer>> entry : allScores.entrySet()) {
                 for (Integer score : entry.getValue()) {
@@ -830,18 +833,7 @@ public class GUIController {
         JPanel leaderboardPanel = new JPanel(new BorderLayout());
         leaderboardPanel.setBackground(new Color(255, 255, 245));
 
-        JLabel title;
-        ImageIcon leaderboardIcon = null;
-        try {
-            leaderboardIcon = new ImageIcon(new ImageIcon("Icons/leaderboard-icon.png").getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH));
-        } catch (Exception e) { leaderboardIcon = null; }
-        if (leaderboardIcon != null) {
-            title = new JLabel("Leaderboard", leaderboardIcon, JLabel.CENTER);
-            title.setHorizontalTextPosition(JLabel.RIGHT);
-            title.setIconTextGap(10);
-        } else {
-            title = new JLabel("\uD83C\uDFC6 Leaderboard");
-        }
+        JLabel title = new JLabel("🏆 Leaderboard");
         title.setFont(new Font("Arial", Font.BOLD, 22));
         title.setHorizontalAlignment(SwingConstants.CENTER);
         title.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
@@ -884,16 +876,20 @@ public class GUIController {
         try {
             DataStorage db = new DataStorage();
             Map<String, List<Integer>> allScores = db.getAllScores();
-            List<Map.Entry<String, Integer>> topList = allScores.entrySet().stream()
-               .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue().isEmpty() ? 0 : Collections.max(e.getValue())))
-                .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
-                .limit(10)
-                .collect(Collectors.toList());
+            // Build a list of name/score pairs for all scores (not just max per user)
+            List<Map.Entry<String, Integer>> topList = new ArrayList<>();
+            for (Map.Entry<String, List<Integer>> entry : allScores.entrySet()) {
+                for (Integer score : entry.getValue()) {
+                    topList.add(new AbstractMap.SimpleEntry<>(entry.getKey(), score));
+                }
+            }
+            topList.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
             StringBuilder lbHtml = new StringBuilder("<html><table width='250'>");
             lbHtml.append("<tr><th align='left'>Rank</th><th align='left'>Name</th><th align='left'>Score</th></tr>");
             int rank = 1;
             for (Map.Entry<String, Integer> entry : topList) {
                 lbHtml.append("<tr><td>").append(rank++).append("</td><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>");
+                if (rank > 10) break;
             }
             lbHtml.append("</table></html>");
             tableLabel.setText(lbHtml.toString());
