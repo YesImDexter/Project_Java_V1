@@ -16,25 +16,78 @@ public class LearningModule {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        // Home Menu
+        // Home Menu (match GUIController theme)
         JPanel homeMenu = new JPanel(new BorderLayout());
-        homeMenu.setBackground(new Color(230, 255, 240));
-        homeMenu.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        homeMenu.setBackground(new Color(220, 245, 230));
+        homeMenu.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setOpaque(false);
+
+        // Logo/Icon (optional, similar to GUIController)
+        JLabel logoLabel;
+        try {
+            ImageIcon logo = new ImageIcon("Resources/logo.png");
+            Image scaled = logo.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+            logoLabel = new JLabel(new ImageIcon(scaled));
+        } catch (Exception e) {
+            logoLabel = new JLabel("\uD83C\uDF31");
+            logoLabel.setFont(new Font("Arial", Font.PLAIN, 60));
+        }
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centerPanel.add(logoLabel);
+        centerPanel.add(Box.createVerticalStrut(10));
 
         JLabel welcomeLabel = new JLabel("Welcome to Environmental Awareness");
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(3, 1, 20, 20));
-        buttonPanel.setBackground(new Color(230, 255, 240));
+        JLabel subtitle = new JLabel("<html><div style='text-align:center;'>Explore learning resources and videos!</div></html>");
+        subtitle.setFont(new Font("Arial", Font.ITALIC, 13));
+        subtitle.setForeground(new Color(34, 139, 34));
+        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centerPanel.add(subtitle);
+
+        centerPanel.add(Box.createVerticalStrut(30));
+
+        // Standardize button sizes and fonts
+        Dimension menuBtnSize = new Dimension(240, 40);
+        Dimension backBtnSize = new Dimension(240, 40);
 
         JButton learningBtn = new JButton("Open Learning Module");
         JButton videoBtn = new JButton("Watch Awareness Videos");
         JButton backToMainBtn = new JButton("Back to Menu");
-        backToMainBtn.setFont(new Font("Arial", Font.PLAIN, 13));
+
+        Font menuFont = new Font("Arial", Font.BOLD, 16);
+
+        learningBtn.setFont(menuFont);
+        videoBtn.setFont(menuFont);
+        backToMainBtn.setFont(menuFont);
+
+        learningBtn.setBackground(new Color(200, 240, 215));
+        videoBtn.setBackground(new Color(200, 240, 215));
         backToMainBtn.setBackground(new Color(255, 220, 220));
-        backToMainBtn.setPreferredSize(new Dimension(120, 32));
+
+        learningBtn.setPreferredSize(menuBtnSize);
+        learningBtn.setMaximumSize(menuBtnSize);
+        learningBtn.setMinimumSize(menuBtnSize);
+        videoBtn.setPreferredSize(menuBtnSize);
+        videoBtn.setMaximumSize(menuBtnSize);
+        videoBtn.setMinimumSize(menuBtnSize);
+        backToMainBtn.setPreferredSize(backBtnSize);
+        backToMainBtn.setMaximumSize(backBtnSize);
+        backToMainBtn.setMinimumSize(backBtnSize);
+
+        learningBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        videoBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        backToMainBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        learningBtn.setFocusPainted(false);
+        videoBtn.setFocusPainted(false);
+        backToMainBtn.setFocusPainted(false);
+
         backToMainBtn.addActionListener(e -> {
             frame.setVisible(false);
             // Try to bring main menu back to front if it exists
@@ -46,18 +99,22 @@ public class LearningModule {
             }
         });
 
-        learningBtn.setFont(new Font("Arial", Font.PLAIN, 16));
-        videoBtn.setFont(new Font("Arial", Font.PLAIN, 16));
-
         learningBtn.addActionListener(e -> cardLayout.show(mainPanel, "learning"));
         videoBtn.addActionListener(e -> cardLayout.show(mainPanel, "videos"));
 
-        buttonPanel.add(learningBtn);
-        buttonPanel.add(videoBtn);
-        buttonPanel.add(backToMainBtn);
+        centerPanel.add(learningBtn);
+        centerPanel.add(Box.createVerticalStrut(15));
+        centerPanel.add(videoBtn);
+        centerPanel.add(Box.createVerticalStrut(15));
+        centerPanel.add(backToMainBtn);
 
-        homeMenu.add(welcomeLabel, BorderLayout.NORTH);
-        homeMenu.add(buttonPanel, BorderLayout.CENTER);
+        centerPanel.add(Box.createVerticalStrut(30));
+        JLabel credits = new JLabel("© 2025 JAVALover G02/SE-G01");
+        credits.setFont(new Font("Arial", Font.PLAIN, 11));
+        credits.setForeground(new Color(100, 120, 100));
+        credits.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        homeMenu.add(centerPanel, BorderLayout.CENTER);
 
         // Learning Module Pages
         JPanel contentWrapper = new JPanel(new CardLayout());
