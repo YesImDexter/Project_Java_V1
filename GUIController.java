@@ -345,6 +345,22 @@ public class GUIController {
 
         JButton logoutBtn = new JButton("Logout");
 
+        // --- Standardize button sizes ---
+        Dimension menuBtnSize = new Dimension(240, 38);
+        Dimension logoutBtnSize = new Dimension(240, 32);
+        quizBtn.setPreferredSize(menuBtnSize);
+        quizBtn.setMaximumSize(menuBtnSize);
+        quizBtn.setMinimumSize(menuBtnSize);
+        learningBtn.setPreferredSize(menuBtnSize);
+        learningBtn.setMaximumSize(menuBtnSize);
+        learningBtn.setMinimumSize(menuBtnSize);
+        leaderboardBtn.setPreferredSize(menuBtnSize);
+        leaderboardBtn.setMaximumSize(menuBtnSize);
+        leaderboardBtn.setMinimumSize(menuBtnSize);
+        logoutBtn.setPreferredSize(logoutBtnSize);
+        logoutBtn.setMaximumSize(logoutBtnSize);
+        logoutBtn.setMinimumSize(logoutBtnSize);
+
         quizBtn.setFont(new Font("Arial", Font.BOLD, 16));
         learningBtn.setFont(new Font("Arial", Font.BOLD, 16));
         leaderboardBtn.setFont(new Font("Arial", Font.BOLD, 16));
