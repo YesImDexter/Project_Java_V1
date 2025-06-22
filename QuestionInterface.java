@@ -1,5 +1,12 @@
+// File: QuestionInterface.java
+// Creator: DEXTER SKUDD ANAK JOHN RIZAL (101630), JEREMY TOMMY AJENG EMANG (99286)
+// Tester: ABDUL HAFIY KAMALUDDIN BIN ABDUL RANI (101476)
+
 import java.util.*;
 
+/**
+ * Interface for all question types.
+ */
 public interface QuestionInterface {
     String getQuestionText();
     boolean isCorrectAnswer(String userAnswer);
@@ -7,6 +14,9 @@ public interface QuestionInterface {
     String getCorrectAnswer();
 }
 
+/**
+ * Abstract base class for all questions.
+ */
 abstract class Question implements QuestionInterface {
     protected String questionText;
     protected int points;
@@ -27,7 +37,9 @@ abstract class Question implements QuestionInterface {
     public abstract String getCorrectAnswer();
 }
 
-// MCQ
+/**
+ * Multiple Choice Question implementation.
+ */
 class MCQQuestion extends Question {
     private List<String> options;
     private int correctOption;
@@ -51,7 +63,9 @@ class MCQQuestion extends Question {
     }
 }
 
-// True/False
+/**
+ * True/False Question implementation.
+ */
 class TrueFalseQuestion extends Question {
     private boolean correctAnswer;
 
@@ -69,7 +83,9 @@ class TrueFalseQuestion extends Question {
     }
 }
 
-// Fill-in-the-blank
+/**
+ * Fill-in-the-blank Question implementation.
+ */
 class FillInBlankQuestion extends Question {
     private List<String> correctAnswers;
 
@@ -87,7 +103,9 @@ class FillInBlankQuestion extends Question {
     }
 }
 
-// Matching
+/**
+ * Matching Question implementation.
+ */
 class MatchingQuestion extends Question {
     private Map<String, String> correctPairs;
 
@@ -118,7 +136,9 @@ class MatchingQuestion extends Question {
         }
     }
 
-    // Partial credit calculation
+    /**
+     * Calculates partial score for matching questions.
+     */
     public int getPartialScore(String userAnswer) {
         try {
             String[] pairs = userAnswer.split(",");
@@ -145,7 +165,9 @@ class MatchingQuestion extends Question {
     }
 }
 
-// Short Answer
+/**
+ * Short Answer Question implementation.
+ */
 class ShortAnswerQuestion extends Question {
     private List<String> keywords;
 

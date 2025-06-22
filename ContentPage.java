@@ -1,18 +1,27 @@
+// File: ContentPage.java
+// Creator: IZZ EZZAD SYAMEIR BIN ISMAIL (97460)
+// Tester: ABDUL HAFIY KAMALUDDIN BIN ABDUL RANI (101476)
+
 import java.awt.*;
 import javax.swing.*;
 
+/**
+ * Represents a single page of learning content.
+ */
 public class ContentPage extends JPanel {
     public ContentPage(int pageNumber, int totalPages, String titleText, String contentText, String imagePath) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Title
         JLabel title = new JLabel(titleText);
         title.setFont(new Font("Arial", Font.BOLD, 18));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(title);
         add(Box.createVerticalStrut(10));
 
+        // Image (if available)
         if (imagePath != null && !imagePath.isEmpty()) {
             try {
                 ImageIcon icon = new ImageIcon(imagePath);
@@ -26,6 +35,7 @@ public class ContentPage extends JPanel {
             }
         }
 
+        // Content text area (scrollable)
         JTextArea content = new JTextArea(contentText);
         content.setWrapStyleWord(true);
         content.setLineWrap(true);
@@ -42,6 +52,7 @@ public class ContentPage extends JPanel {
 
         add(Box.createVerticalStrut(10));
 
+        // Page number label
         JLabel pageNumberLabel = new JLabel("Page " + pageNumber + " of " + totalPages);
         pageNumberLabel.setFont(new Font("Arial", Font.ITALIC, 12));
         pageNumberLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

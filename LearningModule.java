@@ -1,3 +1,7 @@
+// File: LearningModule.java
+// Creator: IZZ EZZAD SYAMEIR BIN ISMAIL (97460)
+// Tester: DEXTER SKUDD ANAK JOHN RIZAL (101630)
+
 import java.awt.*;
 import javax.swing.*;
 

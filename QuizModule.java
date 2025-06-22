@@ -1,8 +1,15 @@
+// File: QuizModule.java
+// Creator: DEXTER SKUDD ANAK JOHN RIZAL (101630)
+// Tester: ABDUL HAFIY KAMALUDDIN BIN ABDUL RANI (101476)
+
 import java.util.*;
 
+/**
+ * Handles quiz logic, question management, and scoring.
+ */
 public class QuizModule {
     private List<QuestionInterface> questions = new ArrayList<>();
-    private List<Boolean> correctness = new ArrayList<>();  // NEW
+    private List<Boolean> correctness = new ArrayList<>();
     private List<String> userAnswers = new ArrayList<>();
     private int score = 0;
     private int currentIndex = 0;
@@ -11,6 +18,9 @@ public class QuizModule {
         loadQuestions();
     }
 
+    /**
+     * Loads quiz questions into the module.
+     */
     private void loadQuestions() {
         questions.add(new MCQQuestion(
             "Which gas contributes the most to climate change?",
@@ -23,7 +33,7 @@ public class QuizModule {
         ));
 
         questions.add(new FillInBlankQuestion(
-            "One source of renewable energy is ____.",
+            "One source of renewable energy is ____. ",
             Arrays.asList("solar", "wind", "hydro"), 10
         ));
 
@@ -44,6 +54,9 @@ public class QuizModule {
         // Add more to meet 20+ as needed
     }
 
+    /**
+     * Returns the current question.
+     */
     public QuestionInterface getCurrentQuestion() {
         if (currentIndex < questions.size()) {
             return questions.get(currentIndex);
@@ -51,6 +64,9 @@ public class QuizModule {
         return null;
     }
 
+    /**
+     * Submits an answer for the current question and updates score.
+     */
     public void submitAnswer(String answer) {
         QuestionInterface q = getCurrentQuestion();
         if (q != null) {
@@ -68,24 +84,39 @@ public class QuizModule {
         }
     }
 
+    /**
+     * Checks if there are more questions.
+     */
     public boolean hasNext() {
         return currentIndex < questions.size();
     }
 
+    /**
+     * Returns the total score earned.
+     */
     public int getScore() {
         return score;
     }
 
+    /**
+     * Returns the total number of questions.
+     */
     public int getTotalQuestions() {
         return questions.size();
     }
 
+    /**
+     * Returns the index of the current question.
+     */
     public int getCurrentIndex() {
         return currentIndex;
     }
 
-    // ✅ NEW METHODS BELOW
+    // --- Additional helper methods ---
 
+    /**
+     * Returns the question at a specific index.
+     */
     public QuestionInterface getQuestionAt(int index) {
         if (index >= 0 && index < questions.size()) {
             return questions.get(index);
@@ -93,6 +124,9 @@ public class QuizModule {
         return null;
     }
 
+    /**
+     * Returns whether the answer at the given index was correct.
+     */
     public boolean wasCorrect(int index) {
         if (index >= 0 && index < correctness.size()) {
             return correctness.get(index);
@@ -100,6 +134,9 @@ public class QuizModule {
         return false;
     }
 
+    /**
+     * Returns the user's answer at the given index.
+     */
     public String getUserAnswer(int index) {
         if (index >= 0 && index < userAnswers.size()) {
             return userAnswers.get(index);
@@ -107,7 +144,9 @@ public class QuizModule {
         return "-";
     }
 
-    // Get the points earned for a specific question (for display)
+    /**
+     * Returns the points earned for a specific question (for display).
+     */
     public int getPointsEarned(int index) {
         if (index < 0 || index >= userAnswers.size()) return 0;
         QuestionInterface q = getQuestionAt(index);

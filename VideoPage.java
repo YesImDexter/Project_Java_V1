@@ -1,9 +1,19 @@
+// File: VideoPage.java
+// Creator: IZZ EZZAD SYAMEIR BIN ISMAIL (97460)
+// Tester: DEXTER SKUDD ANAK JOHN RIZAL (101630)
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.net.URI;
 import javax.swing.*;
 
+/**
+ * VideoPage displays a list of educational videos with clickable buttons.
+ */
 public class VideoPage extends JPanel {
+    /**
+     * Constructs the video page UI.
+     */
     public VideoPage(CardLayout cardLayout, JPanel mainPanel) {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
@@ -15,7 +25,7 @@ public class VideoPage extends JPanel {
         title.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
         add(title, BorderLayout.NORTH);
 
-        // Center panel with buttons
+        // Center panel with video buttons
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new GridLayout(3, 1, 15, 15));
         centerPanel.setBackground(Color.WHITE);
@@ -27,7 +37,7 @@ public class VideoPage extends JPanel {
 
         add(centerPanel, BorderLayout.CENTER);
 
-        // Back button
+        // Back button to return to home
         JButton homeBtn = new JButton(" Back to Home");
         homeBtn.setFont(new Font("Arial", Font.PLAIN, 14));
         homeBtn.setPreferredSize(new Dimension(200, 40));
@@ -41,6 +51,9 @@ public class VideoPage extends JPanel {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Helper to create a button that opens a video URL.
+     */
     private JButton createVideoButton(String label, String url) {
         JButton button = new JButton(label);
         button.setFont(new Font("Arial", Font.PLAIN, 14));

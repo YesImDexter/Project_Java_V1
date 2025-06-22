@@ -1,3 +1,7 @@
+// File: GUIController.java
+// Creator: DEXTER SKUDD ANAK JOHN RIZAL (101630), JEREMY TOMMY AJENG EMANG (99286)
+// Tester: IZZ EZZAD SYAMEIR BIN ISMAIL (97460), ABDUL HAFIY KAMALUDDIN BIN ABDUL RANI (101476)
+
 import java.awt.*;
 import java.io.*;
 import java.util.*;
@@ -5,8 +9,6 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
-
-//SEREYYY 
 
 public class GUIController {
     private JFrame frame;
@@ -26,7 +28,6 @@ public class GUIController {
     private JLabel registerErrorLabel;
     private JLabel homeWelcomeLabel;
 
-//rewe
     public GUIController() {
         frame = new JFrame("Environmental Awareness Quiz");
         frame.setSize(360, 640);
