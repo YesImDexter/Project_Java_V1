@@ -24,6 +24,7 @@ public class GUIController {
     private JLabel registerErrorLabel;
     private JLabel homeWelcomeLabel;
 
+//rewe
     public GUIController() {
         frame = new JFrame("Environmental Awareness Quiz");
         frame.setSize(360, 640);
