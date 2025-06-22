@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,6 +15,14 @@ public class GUIController {
     private JPanel quizPanel;
     private JLabel pointCounter;
     private JTextField inputField;
+    private String currentUser = null;
+    private JPanel loginPanel;
+    private JPanel registerPanel;
+    private JPanel homeMenuPanel;
+    private JPanel leaderboardPanel;
+    private JLabel loginErrorLabel;
+    private JLabel registerErrorLabel;
+    private JLabel homeWelcomeLabel;
 
     public GUIController() {
         frame = new JFrame("Environmental Awareness Quiz");
@@ -24,24 +33,250 @@ public class GUIController {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        // Home menu
-        JPanel homeMenu = createHomeMenu();
+        // Login and Register panels
+        loginPanel = createLoginPanel();
+        registerPanel = createRegisterPanel();
 
+        // Home menu
+        homeMenuPanel = createHomeMenu();
         // Quiz panel (will be reused)
         quizPanel = new JPanel();
         quizPanel.setLayout(new BoxLayout(quizPanel, BoxLayout.Y_AXIS));
         quizPanel.setBackground(Color.WHITE);
-
         // Leaderboard panel
-        JPanel leaderboardPanel = createLeaderboardPanel();
+        leaderboardPanel = createLeaderboardPanel();
 
-        mainPanel.add(homeMenu, "home");
+        mainPanel.add(loginPanel, "login");
+        mainPanel.add(registerPanel, "register");
+        mainPanel.add(homeMenuPanel, "home");
         mainPanel.add(quizPanel, "quiz");
         mainPanel.add(leaderboardPanel, "leaderboard");
 
         frame.setContentPane(mainPanel);
-        cardLayout.show(mainPanel, "home");
+        cardLayout.show(mainPanel, "login");
         frame.setVisible(true);
+    }
+
+    private JPanel createLoginPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(new Color(220, 245, 230));
+        panel.setBorder(BorderFactory.createEmptyBorder(60, 40, 40, 40));
+
+        JLabel title = new JLabel("Login");
+        title.setFont(new Font("Arial", Font.BOLD, 22));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(title);
+        panel.add(Box.createVerticalStrut(20));
+
+        JTextField userField = new JTextField();
+        userField.setMaximumSize(new Dimension(200, 30));
+        userField.setFont(new Font("Arial", Font.PLAIN, 15));
+        userField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        userField.setBorder(BorderFactory.createTitledBorder("Username"));
+        panel.add(userField);
+        panel.add(Box.createVerticalStrut(10));
+
+        JPasswordField passField = new JPasswordField();
+        passField.setMaximumSize(new Dimension(200, 30));
+        passField.setFont(new Font("Arial", Font.PLAIN, 15));
+        passField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        passField.setBorder(BorderFactory.createTitledBorder("Password"));
+        panel.add(passField);
+        panel.add(Box.createVerticalStrut(10));
+
+        loginErrorLabel = new JLabel("");
+        loginErrorLabel.setFont(new Font("Arial", Font.ITALIC, 13));
+        loginErrorLabel.setForeground(Color.RED.darker());
+        loginErrorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(loginErrorLabel);
+        panel.add(Box.createVerticalStrut(10));
+
+        JButton loginBtn = new JButton("Login");
+        loginBtn.setFont(new Font("Arial", Font.BOLD, 15));
+        loginBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(loginBtn);
+        panel.add(Box.createVerticalStrut(10));
+
+        JButton toRegisterBtn = new JButton("No account? Register");
+        toRegisterBtn.setFont(new Font("Arial", Font.PLAIN, 13));
+        toRegisterBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        toRegisterBtn.setBorderPainted(false);
+        toRegisterBtn.setContentAreaFilled(false);
+        toRegisterBtn.setForeground(new Color(0, 102, 204));
+        panel.add(toRegisterBtn);
+
+        loginBtn.addActionListener(e -> {
+            String username = userField.getText().trim();
+            String password = new String(passField.getPassword());
+            if (username.isEmpty() || password.isEmpty()) {
+                loginErrorLabel.setText("Please enter username and password.");
+                return;
+            }
+            if (authenticateUser(username, password)) {
+                currentUser = username;
+                userField.setText("");
+                passField.setText("");
+                loginErrorLabel.setText("");
+                updateHomeMenuWelcome();
+                cardLayout.show(mainPanel, "home");
+            } else {
+                loginErrorLabel.setText("Invalid username or password.");
+            }
+        });
+        toRegisterBtn.addActionListener(e -> {
+            loginErrorLabel.setText("");
+            cardLayout.show(mainPanel, "register");
+        });
+        return panel;
+    }
+
+    private JPanel createRegisterPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(new Color(220, 245, 230));
+        panel.setBorder(BorderFactory.createEmptyBorder(60, 40, 40, 40));
+
+        JLabel title = new JLabel("Register");
+        title.setFont(new Font("Arial", Font.BOLD, 22));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(title);
+        panel.add(Box.createVerticalStrut(20));
+
+        JTextField userField = new JTextField();
+        userField.setMaximumSize(new Dimension(200, 30));
+        userField.setFont(new Font("Arial", Font.PLAIN, 15));
+        userField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        userField.setBorder(BorderFactory.createTitledBorder("Username"));
+        panel.add(userField);
+        panel.add(Box.createVerticalStrut(10));
+
+        JPasswordField passField = new JPasswordField();
+        passField.setMaximumSize(new Dimension(200, 30));
+        passField.setFont(new Font("Arial", Font.PLAIN, 15));
+        passField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        passField.setBorder(BorderFactory.createTitledBorder("Password"));
+        panel.add(passField);
+        panel.add(Box.createVerticalStrut(10));
+
+        registerErrorLabel = new JLabel("");
+        registerErrorLabel.setFont(new Font("Arial", Font.ITALIC, 13));
+        registerErrorLabel.setForeground(Color.RED.darker());
+        registerErrorLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(registerErrorLabel);
+        panel.add(Box.createVerticalStrut(10));
+
+        JButton registerBtn = new JButton("Register");
+        registerBtn.setFont(new Font("Arial", Font.BOLD, 15));
+        registerBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(registerBtn);
+        panel.add(Box.createVerticalStrut(10));
+
+        JButton toLoginBtn = new JButton("Already have an account? Login");
+        toLoginBtn.setFont(new Font("Arial", Font.PLAIN, 13));
+        toLoginBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        toLoginBtn.setBorderPainted(false);
+        toLoginBtn.setContentAreaFilled(false);
+        toLoginBtn.setForeground(new Color(0, 102, 204));
+        panel.add(toLoginBtn);
+
+        registerBtn.addActionListener(e -> {
+            String username = userField.getText().trim();
+            String password = new String(passField.getPassword());
+            if (username.isEmpty() || password.isEmpty()) {
+                registerErrorLabel.setText("Please enter username and password.");
+                return;
+            }
+            if (!username.matches("[A-Za-z0-9_]{3,20}")) {
+                registerErrorLabel.setText("Username must be 3-20 letters, numbers, or _");
+                return;
+            }
+            if (password.length() < 3) {
+                registerErrorLabel.setText("Password must be at least 3 characters.");
+                return;
+            }
+            if (userExists(username)) {
+                registerErrorLabel.setText("Username already exists.");
+                return;
+            }
+            if (username.contains(":") || password.contains(":")) {
+                registerErrorLabel.setText("Invalid character ':' in username or password.");
+                return;
+            }
+            if (registerUser(username, password)) {
+                currentUser = username;
+                userField.setText("");
+                passField.setText("");
+                registerErrorLabel.setText("");
+                updateHomeMenuWelcome();
+                cardLayout.show(mainPanel, "home");
+            } else {
+                registerErrorLabel.setText("Registration failed. Try again.");
+            }
+        });
+        toLoginBtn.addActionListener(e -> {
+            registerErrorLabel.setText("");
+            cardLayout.show(mainPanel, "login");
+        });
+        return panel;
+    }
+
+    private Map<String, String> loadUserDatabase() {
+        Map<String, String> users = new HashMap<>();
+        File dbFile = new File("user_database.txt");
+        if (!dbFile.exists()) return users;
+        try (BufferedReader br = new BufferedReader(new FileReader(dbFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || !line.contains(":")) continue;
+                String[] parts = line.split(":", 2);
+                if (parts.length == 2) {
+                    users.put(parts[0].trim(), parts[1].trim());
+                }
+            }
+        } catch (IOException e) {
+            // ignore, return what we have
+        }
+        return users;
+    }
+
+    private boolean authenticateUser(String username, String password) {
+        Map<String, String> users = loadUserDatabase();
+        System.out.println("Loaded users: " + users);
+        String user = username.trim();
+        String pass = password.trim();
+        if (!users.containsKey(user)) {
+            System.out.println("Username not found: " + user);
+            return false;
+        }
+        if (!users.get(user).equals(pass)) {
+            System.out.println("Password mismatch for user: " + user + ". Expected: [" + users.get(user) + "] Got: [" + pass + "]");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean userExists(String username) {
+        Map<String, String> users = loadUserDatabase();
+        return users.containsKey(username);
+    }
+
+    private boolean registerUser(String username, String password) {
+        File dbFile = new File("user_database.txt");
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(dbFile, true))) {
+            bw.write(username + ":" + password);
+            bw.newLine();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    private void updateHomeMenuWelcome() {
+        if (homeWelcomeLabel != null) {
+            homeWelcomeLabel.setText("Welcome, " + (currentUser != null ? currentUser : "Guest"));
+        }
     }
 
     private JPanel createHomeMenu() {
@@ -67,11 +302,11 @@ public class GUIController {
         centerPanel.add(logoLabel);
         centerPanel.add(Box.createVerticalStrut(10));
 
-        JLabel welcomeLabel = new JLabel("Welcome to Environmental Quiz");
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        centerPanel.add(welcomeLabel);
+        homeWelcomeLabel = new JLabel("Welcome, Guest");
+        homeWelcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        homeWelcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        homeWelcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        centerPanel.add(homeWelcomeLabel);
 
         JLabel subtitle = new JLabel("<html><div style='text-align:center;'>Test your knowledge and see how you rank!</div></html>");
         subtitle.setFont(new Font("Arial", Font.ITALIC, 13));
@@ -82,21 +317,26 @@ public class GUIController {
         centerPanel.add(Box.createVerticalStrut(30));
 
         JButton quizBtn = new JButton("📝  Start Quiz");
-        JButton learningBtn = new JButton("📖  Open Learning Module"); // <-- Added
+        JButton learningBtn = new JButton("📖  Open Learning Module");
         JButton leaderboardBtn = new JButton("🏆  View Leaderboard");
+        JButton logoutBtn = new JButton("Logout");
 
         quizBtn.setFont(new Font("Arial", Font.BOLD, 16));
         learningBtn.setFont(new Font("Arial", Font.BOLD, 16));
         leaderboardBtn.setFont(new Font("Arial", Font.BOLD, 16));
+        logoutBtn.setFont(new Font("Arial", Font.BOLD, 13));
         quizBtn.setBackground(new Color(200, 240, 215));
         learningBtn.setBackground(new Color(200, 240, 215));
         leaderboardBtn.setBackground(new Color(255, 240, 200));
+        logoutBtn.setBackground(new Color(255, 220, 220));
         quizBtn.setFocusPainted(false);
         learningBtn.setFocusPainted(false);
         leaderboardBtn.setFocusPainted(false);
+        logoutBtn.setFocusPainted(false);
         quizBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         learningBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         leaderboardBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        logoutBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         quizBtn.addActionListener(e -> {
             quiz = new QuizModule();
@@ -110,12 +350,18 @@ public class GUIController {
             updateLeaderboardPanel();
             cardLayout.show(mainPanel, "leaderboard");
         });
+        logoutBtn.addActionListener(e -> {
+            currentUser = null;
+            cardLayout.show(mainPanel, "login");
+        });
 
         centerPanel.add(quizBtn);
         centerPanel.add(Box.createVerticalStrut(15));
-        centerPanel.add(learningBtn); // <-- Added
+        centerPanel.add(learningBtn);
         centerPanel.add(Box.createVerticalStrut(15));
         centerPanel.add(leaderboardBtn);
+        centerPanel.add(Box.createVerticalStrut(15));
+        centerPanel.add(logoutBtn);
 
         centerPanel.add(Box.createVerticalStrut(30));
         JLabel credits = new JLabel("© 2024 GreenEarth Initiative");
@@ -129,6 +375,10 @@ public class GUIController {
     }
 
     private void showQuizPanel() {
+        if (currentUser == null) {
+            cardLayout.show(mainPanel, "login");
+            return;
+        }
         quizPanel.removeAll();
         quizPanel.setBackground(Color.WHITE);
 
@@ -473,22 +723,28 @@ public class GUIController {
         leaderboardPanel.setBorder(BorderFactory.createTitledBorder("Leaderboard"));
         leaderboardPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        String name = JOptionPane.showInputDialog(frame, "Enter your name for the leaderboard:", "Leaderboard", JOptionPane.PLAIN_MESSAGE);
-        if (name == null || name.trim().isEmpty()) name = "Anonymous";
+        // Use current user for leaderboard name, skip prompt
+        String name = currentUser != null ? currentUser : System.getProperty("user.name");
+        // If you have a login system, use the logged-in username variable instead
+        // String name = currentUser != null ? currentUser : "Anonymous";
         try {
             DataStorage db = new DataStorage();
             db.saveScore(name, userScore);
             Map<String, List<Integer>> allScores = db.getAllScores();
-            List<Map.Entry<String, Integer>> topList = allScores.entrySet().stream()
-                .map(e -> Map.entry(e.getKey(), e.getValue().isEmpty() ? 0 : Collections.max(e.getValue())))
-                .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
-                .limit(10)
-                .collect(Collectors.toList());
+            // Build a list of name/score pairs for all scores
+            List<Map.Entry<String, Integer>> topList = new ArrayList<>();
+            for (Map.Entry<String, List<Integer>> entry : allScores.entrySet()) {
+                for (Integer score : entry.getValue()) {
+                    topList.add(new AbstractMap.SimpleEntry<>(entry.getKey(), score));
+                }
+            }
+            topList.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
             StringBuilder lbHtml = new StringBuilder("<html><table width='250'>");
             lbHtml.append("<tr><th align='left'>Rank</th><th align='left'>Name</th><th align='left'>Score</th></tr>");
             int rank = 1;
             for (Map.Entry<String, Integer> entry : topList) {
                 lbHtml.append("<tr><td>").append(rank++).append("</td><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>");
+                if (rank > 10) break;
             }
             lbHtml.append("</table></html>");
             JLabel lbLabel = new JLabel(lbHtml.toString());
@@ -571,13 +827,14 @@ public class GUIController {
     }
 
     private void updateLeaderboardPanel() {
-        JPanel leaderboardPanel = (JPanel) mainPanel.getComponent(2); // index of leaderboard panel
-        JLabel tableLabel = (JLabel) leaderboardPanel.getClientProperty("tableLabel");
+        // Use stored leaderboardPanel reference
+        JPanel lbPanel = leaderboardPanel;
+        JLabel tableLabel = (JLabel) lbPanel.getClientProperty("tableLabel");
         try {
             DataStorage db = new DataStorage();
             Map<String, List<Integer>> allScores = db.getAllScores();
             List<Map.Entry<String, Integer>> topList = allScores.entrySet().stream()
-                .map(e -> Map.entry(e.getKey(), e.getValue().isEmpty() ? 0 : Collections.max(e.getValue())))
+               .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue().isEmpty() ? 0 : Collections.max(e.getValue())))
                 .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
                 .limit(10)
                 .collect(Collectors.toList());

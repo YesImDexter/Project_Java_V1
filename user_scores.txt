@@ -1,3 +1,4 @@
 user1:90
 user2:80
+dexter:20
 Dexter:15
