@@ -525,14 +525,23 @@ public class GUIController {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(240, 245, 255));
         JLabel title = new JLabel("Achievements");
-        title.setFont(new Font("Arial", Font.BOLD, 22));
+        title.setFont(new Font("Arial", Font.BOLD, 26));
         title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+        title.setBorder(BorderFactory.createEmptyBorder(24, 0, 10, 0));
         panel.add(title, BorderLayout.NORTH);
 
-        JPanel badgePanel = new JPanel();
-        badgePanel.setLayout(new BoxLayout(badgePanel, BoxLayout.Y_AXIS));
-        badgePanel.setOpaque(false);
+        // Use vertical BoxLayout for vertical alignment
+        JPanel cardPanel = new JPanel();
+        cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
+        cardPanel.setOpaque(false);
+        cardPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createEmptyBorder(18, 18, 18, 18),
+            BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(180, 200, 230), 2, true),
+                BorderFactory.createEmptyBorder(18, 18, 18, 18)
+            )
+        ));
+        cardPanel.setBackground(new Color(255, 255, 255, 220));
 
         // Badge definitions: {badgeKey, name, description, iconPath}
         String[][] badges = {
@@ -541,34 +550,52 @@ public class GUIController {
             {"badge3", "Perfect Score!", "Get all answers correct in a quiz.", "Badges/badge3.png"}
         };
         Set<String> userBadges = currentUser != null ? getUserBadges(currentUser) : new HashSet<>();
+
         for (String[] badge : badges) {
-            JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            row.setOpaque(false);
+            JPanel badgeCard = new JPanel();
+            badgeCard.setLayout(new BoxLayout(badgeCard, BoxLayout.Y_AXIS));
+            badgeCard.setOpaque(false);
+            badgeCard.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(userBadges.contains(badge[0]) ? new Color(60, 180, 90) : new Color(180, 180, 180), 2, true),
+                BorderFactory.createEmptyBorder(10, 18, 10, 18)
+            ));
+            badgeCard.setBackground(userBadges.contains(badge[0]) ? new Color(220, 255, 220) : new Color(245, 245, 245));
+            badgeCard.setMaximumSize(new Dimension(260, 110));
+            badgeCard.setPreferredSize(new Dimension(260, 110));
+            badgeCard.setAlignmentX(Component.CENTER_ALIGNMENT);
+
             JLabel iconLabel;
             try {
-                ImageIcon icon = new ImageIcon(new ImageIcon(badge[3]).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH));
+                ImageIcon icon = new ImageIcon(new ImageIcon(badge[3]).getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH));
                 if (!userBadges.contains(badge[0])) {
-                    // Grey out icon if not earned
                     Image img = GrayFilter.createDisabledImage(icon.getImage());
                     icon = new ImageIcon(img);
                 }
                 iconLabel = new JLabel(icon);
             } catch (Exception e) {
                 iconLabel = new JLabel(userBadges.contains(badge[0]) ? "★" : "☆");
-                iconLabel.setFont(new Font("Arial", Font.BOLD, 28));
+                iconLabel.setFont(new Font("Arial", Font.BOLD, 38));
             }
-            row.add(iconLabel);
+            iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            badgeCard.add(iconLabel);
+
             JLabel name = new JLabel(badge[1]);
             name.setFont(new Font("Arial", Font.BOLD, 16));
             name.setForeground(userBadges.contains(badge[0]) ? new Color(34, 139, 34) : Color.GRAY);
-            row.add(name);
-            JLabel desc = new JLabel(" - " + badge[2]);
+            name.setAlignmentX(Component.CENTER_ALIGNMENT);
+            badgeCard.add(name);
+
+            JLabel desc = new JLabel("<html><div style='text-align:center;'>" + badge[2] + "</div></html>");
             desc.setFont(new Font("Arial", Font.PLAIN, 13));
             desc.setForeground(Color.DARK_GRAY);
-            row.add(desc);
-            badgePanel.add(row);
+            desc.setAlignmentX(Component.CENTER_ALIGNMENT);
+            badgeCard.add(desc);
+
+            cardPanel.add(badgeCard);
+            cardPanel.add(Box.createVerticalStrut(18));
         }
-        panel.add(badgePanel, BorderLayout.CENTER);
+
+        panel.add(cardPanel, BorderLayout.CENTER);
 
         JButton backBtn = new JButton("⟵ Back to Home");
         backBtn.setFont(new Font("Arial", Font.BOLD, 15));
@@ -1029,34 +1056,45 @@ public class GUIController {
 
     private JPanel createLeaderboardPanel() {
         JPanel leaderboardPanel = new JPanel(new BorderLayout());
-        leaderboardPanel.setBackground(new Color(255, 255, 245));
+        leaderboardPanel.setBackground(new Color(245, 250, 255));
 
         JLabel title = new JLabel("🏆 Leaderboard");
-        title.setFont(new Font("Arial", Font.BOLD, 22));
+        title.setFont(new Font("Arial", Font.BOLD, 26));
         title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+        title.setBorder(BorderFactory.createEmptyBorder(24, 0, 10, 0));
         leaderboardPanel.add(title, BorderLayout.NORTH);
 
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setOpaque(false);
+        // Card effect for leaderboard table
+        JPanel cardPanel = new JPanel();
+        cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
+        cardPanel.setOpaque(false);
+        cardPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createEmptyBorder(18, 18, 18, 18),
+            BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(180, 200, 230), 2, true),
+                BorderFactory.createEmptyBorder(18, 18, 18, 18)
+            )
+        ));
+        cardPanel.setBackground(new Color(255, 255, 255, 220));
 
         // Placeholder, will be updated before showing
         JLabel tableLabel = new JLabel();
         tableLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        centerPanel.add(tableLabel);
+        tableLabel.setFont(new Font("Monospaced", Font.PLAIN, 16));
+        cardPanel.add(tableLabel);
 
-        leaderboardPanel.add(centerPanel, BorderLayout.CENTER);
+        leaderboardPanel.add(cardPanel, BorderLayout.CENTER);
 
         JButton backBtn = new JButton("⟵ Back to Home");
         backBtn.setFont(new Font("Arial", Font.BOLD, 15));
         backBtn.setBackground(new Color(220, 245, 230));
         backBtn.setFocusPainted(false);
         backBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // --- FIX: Add working action listener for back button ---
         backBtn.addActionListener(e -> cardLayout.show(mainPanel, "home"));
 
         JPanel bottomPanel = new JPanel();
-        bottomPanel.setBackground(new Color(255, 255, 245));
+        bottomPanel.setBackground(new Color(245, 250, 255));
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(18, 10, 18, 10));
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
         bottomPanel.add(backBtn);
@@ -1068,13 +1106,11 @@ public class GUIController {
     }
 
     private void updateLeaderboardPanel() {
-        // Use stored leaderboardPanel reference
         JPanel lbPanel = leaderboardPanel;
         JLabel tableLabel = (JLabel) lbPanel.getClientProperty("tableLabel");
         try {
             DataStorage db = new DataStorage();
             Map<String, List<Integer>> allScores = db.getAllScores();
-            // Build a list of name/score pairs for all scores (not just max per user)
             List<Map.Entry<String, Integer>> topList = new ArrayList<>();
             for (Map.Entry<String, List<Integer>> entry : allScores.entrySet()) {
                 for (Integer score : entry.getValue()) {
@@ -1082,12 +1118,30 @@ public class GUIController {
                 }
             }
             topList.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
-            StringBuilder lbHtml = new StringBuilder("<html><table width='250'>");
-            lbHtml.append("<tr><th align='left'>Rank</th><th align='left'>Name</th><th align='left'>Score</th></tr>");
+
+            // Build HTML table with alternating row colors and highlight top 3
+            StringBuilder lbHtml = new StringBuilder("<html><style>");
+            lbHtml.append("table {border-collapse:collapse; width:270px;}");
+            lbHtml.append("th,td {padding:6px 10px; font-size:15px;}");
+            lbHtml.append("th.scorecol, td.scorecol { color:#1a4d1a; font-weight:bold; }"); // Make score more visible
+            lbHtml.append("</style><table>");
+            lbHtml.append("<tr style='background:#e0f0ff;'>"
+                + "<th align='left'>Rank</th>"
+                + "<th align='left'>Name</th>"
+                + "<th align='left' class='scorecol'>Score</th></tr>");
             int rank = 1;
             for (Map.Entry<String, Integer> entry : topList) {
-                lbHtml.append("<tr><td>").append(rank++).append("</td><td>").append(entry.getKey()).append("</td><td>").append(entry.getValue()).append("</td></tr>");
-                if (rank > 10) break;
+                String rowColor;
+                if (rank == 1) rowColor = "#ffe680"; // gold
+                else if (rank == 2) rowColor = "#c0c0c0"; // silver
+                else if (rank == 3) rowColor = "#ffd580"; // bronze
+                else rowColor = (rank % 2 == 0) ? "#f7fbff" : "#eaf3fa";
+                lbHtml.append("<tr style='background:").append(rowColor).append(";'>");
+                lbHtml.append("<td>").append(rank <= 3 ? "🥇🥈🥉".charAt(rank - 1) : rank).append("</td>");
+                lbHtml.append("<td>").append(entry.getKey()).append("</td>");
+                lbHtml.append("<td class='scorecol'>").append(entry.getValue()).append("</td>");
+                lbHtml.append("</tr>");
+                if (++rank > 10) break;
             }
             lbHtml.append("</table></html>");
             tableLabel.setText(lbHtml.toString());
