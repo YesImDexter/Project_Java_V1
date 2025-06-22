@@ -12,6 +12,7 @@ public class GUIController {
     private JTextField inputField;
     private JLabel pointCounter;
     private java.util.List<String[]> leaderboard = new ArrayList<>(); // [name, score]
+    private DataStorage dataStorage = new DataStorage();
 
     public GUIController() {
         quiz = new QuizModule();
@@ -153,22 +154,40 @@ public class GUIController {
             leaderboardPanel.setLayout(new BoxLayout(leaderboardPanel, BoxLayout.Y_AXIS));
             leaderboardPanel.setBorder(BorderFactory.createTitledBorder("Leaderboard"));
             leaderboardPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            // Prompt for name and add to leaderboard
+            // Prompt for name and add to leaderboard and persistent storage
             String name = JOptionPane.showInputDialog(frame, "Enter your name for the leaderboard:", "Leaderboard", JOptionPane.PLAIN_MESSAGE);
             if (name == null || name.trim().isEmpty()) name = "Anonymous";
             leaderboard.add(new String[]{name, String.valueOf(userScore)});
-            // Sort leaderboard by score descending
-            leaderboard.sort((a, b) -> Integer.parseInt(b[1]) - Integer.parseInt(a[1]));
+            try {
+                dataStorage.saveScore(name, userScore);
+            } catch (DataStorageException e) {
+                JOptionPane.showMessageDialog(frame, "Failed to save score: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            // Load all scores from file for leaderboard
+            java.util.Map<String, java.util.List<Integer>> allScores;
+            try {
+                allScores = dataStorage.getAllScores();
+            } catch (DataStorageException e) {
+                allScores = new java.util.HashMap<>();
+            }
+            java.util.List<String[]> leaderboardList = new java.util.ArrayList<>();
+            for (java.util.Map.Entry<String, java.util.List<Integer>> entry : allScores.entrySet()) {
+                for (Integer score : entry.getValue()) {
+                    leaderboardList.add(new String[]{entry.getKey(), String.valueOf(score)});
+                }
+            }
+            leaderboardList.sort((a, b) -> Integer.parseInt(b[1]) - Integer.parseInt(a[1]));
             StringBuilder lbHtml = new StringBuilder("<html><table width='250'>");
             lbHtml.append("<tr><th align='left'>Rank</th><th align='left'>Name</th><th align='left'>Score</th></tr>");
             int rank = 1;
-            for (String[] entry : leaderboard) {
+            for (String[] entry : leaderboardList) {
                 lbHtml.append("<tr><td>").append(rank++).append("</td><td>").append(entry[0]).append("</td><td>").append(entry[1]).append("</td></tr>");
                 if (rank > 10) break;
             }
             lbHtml.append("</table></html>");
             JLabel lbLabel = new JLabel(lbHtml.toString());
             lbLabel.setFont(new Font("Monospaced", Font.PLAIN, 13));
+            leaderboardPanel.removeAll();
             leaderboardPanel.add(lbLabel);
 
             // Layout: resultPanel (summary) + table (full width) + leaderboard + restart button

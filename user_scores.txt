@@ -1,0 +1,3 @@
+user1:90
+user2:80
+Dexter:15
